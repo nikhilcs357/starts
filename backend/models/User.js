@@ -15,3 +15,4 @@ const userSchema = new mongoose.Schema({
 },{timestamps: true, minimize: false})
 
 const user=mongoose.model('user', userSchema)
+
