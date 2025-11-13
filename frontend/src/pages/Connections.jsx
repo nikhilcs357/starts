@@ -18,21 +18,20 @@ const Connections = () => {
   const [currentTab, setCurrentTab] = useState("Followers");
   const navigate = useNavigate();
 
-  //  Tab Data
+  // ✅ Tab Data (Fixed icon capitalization)
   const dataArray = [
-    { label: "Followers", value: Followers, icon: Users },
-    { label: "Following", value: Following, icon: UserCheck },
-    { label: "Pending", value: PendingConnections, icon: UserRoundPen },
-    { label: "Connections", value: connections, icon: UserPlus },
+    { label: "Followers", value: Followers, Icon: Users },
+    { label: "Following", value: Following, Icon: UserCheck },
+    { label: "Pending", value: PendingConnections, Icon: UserRoundPen },
+    { label: "Connections", value: connections, Icon: UserPlus },
   ];
 
-  //  Current Tab Data
   const currentData = dataArray.find((tab) => tab.label === currentTab)?.value || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <div className="max-w-6xl mx-auto p-6">
-        {/*  Title */}
+        {/* Title */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-slate-900 mb-1">Connections</h1>
           <p className="text-slate-600">
@@ -40,7 +39,7 @@ const Connections = () => {
           </p>
         </div>
 
-        {/*  Stats */}
+        {/* Stats */}
         <div className="mb-8 flex flex-wrap justify-center gap-6">
           {dataArray.map((item, index) => (
             <div
@@ -53,7 +52,7 @@ const Connections = () => {
           ))}
         </div>
 
-        {/*  Tabs */}
+        {/* Tabs */}
         <div className="flex flex-wrap justify-center gap-3 border border-gray-200 rounded-xl bg-white shadow-sm p-2 mb-8">
           {dataArray.map((tab) => (
             <button
@@ -65,7 +64,7 @@ const Connections = () => {
                   : "text-gray-600 hover:bg-gray-100"
               }`}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.Icon className="w-4 h-4" />
               {tab.label}
               <span className="ml-2 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
                 {tab.value.length}
@@ -74,7 +73,7 @@ const Connections = () => {
           ))}
         </div>
 
-        {/*  Connection Cards */}
+        {/* Connection Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentData.map((user) => (
             <div
@@ -94,7 +93,6 @@ const Connections = () => {
                 {user.bio?.slice(0, 40) || "No bio available"}
               </p>
 
-              {/* Buttons */}
               <div className="flex gap-2 mt-4 w-full">
                 <button
                   onClick={() => navigate(`/profile/${user._id}`)}
@@ -128,7 +126,6 @@ const Connections = () => {
             </div>
           ))}
 
-          {/* If Empty */}
           {currentData.length === 0 && (
             <p className="col-span-full text-center text-gray-500 italic">
               No {currentTab.toLowerCase()} yet 😅

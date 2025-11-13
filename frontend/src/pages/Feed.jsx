@@ -32,8 +32,8 @@ const Feed = () => {
         <div>
           <StoriesBar/>
           <div className="p-4 space-y-6">
-            {feeds.map((post)=>(
-              <PostCard key={post.id} post={post}/>
+            {feeds.map((post, index)=>(
+              <PostCard key={post.id || index} post={post}/>
             ))}
           </div>
         </div>
