@@ -1,6 +1,6 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
-import Connection from "../models/connection.js"; // Capitalized to avoid variable conflict
+import Connection from "../models/connection.js"; 
 import sendEmail from "../config/nodeMailer.js";
 
 // Create a client to send and receive events
