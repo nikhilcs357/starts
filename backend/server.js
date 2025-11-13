@@ -22,6 +22,11 @@ app.get('/', (req, res) => res.send('Server is running'));
 app.use('/api/inngest', serve({ client: inngest, functions }));
 app.use('/api/user', userRouter);
 
-// start server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(` Server is running on port ${PORT}`));
+// ✅ export app for Vercel serverless function
+export default app;
+
+// ✅ only start the server locally
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => console.log(` Server is running on port ${PORT}`));
+}
