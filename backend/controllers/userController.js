@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import fs from "fs";
 import ImageKit from "../config/imagekit.js";
-import Connection from "../models/connection.js";
+import Connection from "../models/Connection.js";
 
 
 // get user data using userId
