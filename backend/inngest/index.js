@@ -5,7 +5,7 @@ import sendEmail from "../config/nodeMailer.js";
 import Story from "../models/Story.js";
 import Message from "../models/Message.js";
 
-// Create a client to send and receive events
+// Create a client
 export const inngest = new Inngest({ id: "sociofy-app" });
 
 /* --------------------------- USER CREATED --------------------------- */
@@ -16,9 +16,8 @@ const syncUserCreation = inngest.createFunction(
     const { id, first_name, last_name, email_addresses, image_url } = event.data;
 
     let username = email_addresses[0].email_address.split("@")[0];
-
-    // Check username availability
     const existingUser = await User.findOne({ username });
+
     if (existingUser) {
       username = username + Math.floor(Math.random() * 10000);
     }
@@ -58,14 +57,13 @@ const syncUserDeletion = inngest.createFunction(
   }
 );
 
-/* ------------------- SEND CONNECTION REQUEST REMINDER ------------------- */
+/* ---------------- CONNECTION REQUEST REMINDER ---------------- */
 const sendNewConnectionRequestReminder = inngest.createFunction(
   { id: "send-new-connection-request-reminder" },
   { event: "app/connection-request" },
   async ({ event, step }) => {
     const { connectionId } = event.data;
 
-    // Initial Email
     await step.run("send-connection-request-mail", async () => {
       const conn = await Connection.findById(connectionId).populate(
         "from_user_id to_user_id"
@@ -77,8 +75,7 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
           <h2>Hi ${conn.to_user_id.full_name},</h2>
           <p>You have a new connection request from 
           ${conn.from_user_id.full_name} (@${conn.from_user_id.username}).</p>
-          <p><a href="${process.env.FRONTEND_URL}/connections">View request</a></p>
-          <p>Thanks,<br/>Sociofy</p>
+          <a href="${process.env.FRONTEND_URL}/connections">View request</a>
         </div>
       `;
 
@@ -89,17 +86,14 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
       });
     });
 
-    // Wait 24 hours
     const in24Hours = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await step.sleepUntil("wait-for-24-hours", in24Hours);
 
-    // Reminder Email
     await step.run("send-connection-request-reminder", async () => {
       const conn = await Connection.findById(connectionId).populate(
         "from_user_id to_user_id"
       );
 
-      // Already accepted → no reminder
       if (conn.status === "accepted") return;
 
       const subject = `Reminder: You have a pending connection request`;
@@ -108,8 +102,7 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
           <h2>Hi ${conn.to_user_id.full_name},</h2>
           <p>You still have a pending request from 
           ${conn.from_user_id.full_name} (@${conn.from_user_id.username}).</p>
-          <p><a href="${process.env.FRONTEND_URL}/connections">Respond now</a></p>
-          <p>Thanks,<br/>Sociofy</p>
+          <a href="${process.env.FRONTEND_URL}/connections">Respond</a>
         </div>
       `;
 
@@ -118,13 +111,11 @@ const sendNewConnectionRequestReminder = inngest.createFunction(
         subject,
         body,
       });
-
-      return { message: "Reminder sent" };
     });
   }
 );
 
-/* --------------------------- DELETE STORY AFTER 24 HRS --------------------------- */
+/* --------------------------- AUTO DELETE STORY --------------------------- */
 const deleteStory = inngest.createFunction(
   { id: "story-delete" },
   { event: "app/story.delete" },
@@ -141,11 +132,11 @@ const deleteStory = inngest.createFunction(
   }
 );
 
-/* --------- SEND DAILY NOTIFICATION ABOUT UNSEEN MESSAGES (CRON FIXED) --------- */
+/* --------------- CRON: SEND UNSEEN MESSAGE NOTIFICATIONS --------------- */
 const SendNotificationOfUnseenMessages = inngest.createFunction(
   { id: "send-unseen-messages-notification" },
 
-  // FIXED: Correct cron (runs everyday at 9 AM New York time)
+  // Correct cron — 6 fields only
   { cron: "TZ=America/New_York 0 0 9 * * *" },
 
   async ({ step }) => {
@@ -162,13 +153,11 @@ const SendNotificationOfUnseenMessages = inngest.createFunction(
       const user = await User.findById(userId);
 
       const subject = `💬 You have ${unseenCount[userId]} unseen messages`;
-
       const body = `
         <div style="font-family: Arial; padding: 20px;">
           <h2>Hi ${user.full_name},</h2>
           <p>You have ${unseenCount[userId]} unseen messages.</p>
-          <p><a href="${process.env.FRONTEND_URL}/messages">Read messages</a></p>
-          <p>Thanks,<br/>Sociofy</p>
+          <a href="${process.env.FRONTEND_URL}/messages">View messages</a>
         </div>
       `;
 
