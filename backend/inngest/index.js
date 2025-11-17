@@ -135,7 +135,7 @@ const deleteStory = inngest.createFunction(
       return {message: "story deleted."}
     })
   }
-)
+);
 
 const SendNotificationOfUnseenMessages = inngest.createFunction(
   {id: "send-unseen-messages-notification"},
@@ -174,7 +174,7 @@ const SendNotificationOfUnseenMessages = inngest.createFunction(
     }
     return {message: "Notification sent."}
   }
-)
+);
 
 //  Export all functions
 export const functions = [
