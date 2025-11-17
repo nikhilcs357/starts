@@ -4,7 +4,7 @@ import { protect } from '../middlewares/auth.js';
 import { addUserStory, getStories } from '../controllers/storyController.js';
 
 
-const storyRouter = express.Router()
+const storyRouter = express.Router();
 
 storyRouter.post('/create', upload.single('media'), protect, addUserStory)
 storyRouter.get('/get',  protect, getStories)
