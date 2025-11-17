@@ -56,7 +56,7 @@ export const addpost = async (req, res) => {
 export const getFeedPosts = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const me = await User.findById(userId);   // FIX: renamed variable
+    const me = await User.findById(userId);   
 
     const userIds = [userId, ...me.connections, ...me.following];
 
@@ -67,7 +67,7 @@ export const getFeedPosts = async (req, res) => {
     res.json({ success: true, posts });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });  // FIX: typo
+    res.json({ success: false, message: error.message });  
   }
 };
 
@@ -90,6 +90,6 @@ export const likePost = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: error.message });  // FIX
+    res.json({ success: false, message: error.message });  
   }
 };
