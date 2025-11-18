@@ -225,46 +225,27 @@ export const sendConnectionRequest = async (req,res) => {
   }
 }
 
-export const getUserConnections = async (req, res) => {
+// get user connection
+
+export const getUserConnections = async (req,res) => {
   try {
-    const auth = req.auth();   // call function
-    const userId = auth?.userId;
+    const {userId} = req.auth()
+    const user = await User.findById(userId).populate('connections followers following')
 
-    if (!userId) {
-      return res.status(401).json({ success: false, message: "Unauthorized" });
-    }
+    const connections = user.connections
+    const followers = user.followers
+    const following = user.following
 
-    const user = await User.findById(userId)
-      .populate("connections followers following");
+    const pendingConnections = (await connection.find({to_user_id: userId,
+      status: 'pending'}).populate('from_user_id')).map(connection => connection.from_user_id)
 
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    const connections = user.connections;
-    const followers = user.followers;
-    const following = user.following;
-
-    const pendingConnections = (
-      await Connection.find({
-        to_user_id: userId,
-        status: "pending",
-      }).populate("from_user_id")
-    ).map((c) => c.from_user_id);
-
-    res.json({
-      success: true,
-      connections,
-      followers,
-      following,
-      pendingConnections,
-    });
+      res.json({success: true, connections, followers, following, pendingConnections})
+    
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: error.message });
+   console.log(error);
+   res.json({success: false, message: error.message})
   }
-};
-
+}
 
 // Accept connection request
 
