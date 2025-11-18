@@ -8,7 +8,6 @@ import { clerkMiddleware } from '@clerk/express';
 import userRouter from './routes/userRoutes.js';
 import PostRouter from './routes/postRoutes.js';
 import storyRouter from './routes/storyRoutes.js';
-import messageRouter from './routes/messageRoutes.js';
 
 const app = express();
 
@@ -24,9 +23,9 @@ app.use(clerkMiddleware());
 app.get('/', (req, res) => res.send('Server is running'));
 app.use('/api/inngest', serve({ client: inngest, functions }));
 app.use('/api/user', userRouter);
-app.use('/api/post', PostRouter)
-app.use('api/story', storyRouter)
-app.use('api/message', messageRouter)
+app.use('/api/post', PostRouter);
+app.use('/api/story', storyRouter);
+app.use('/api/message', messageRouter); // fixed
 
 
 // start server
