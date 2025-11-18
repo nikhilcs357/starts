@@ -25,8 +25,9 @@ app.get('/', (req, res) => res.send('Server is running'));
 app.use('/api/inngest', serve({ client: inngest, functions }));
 app.use('/api/user', userRouter);
 app.use('/api/post', PostRouter)
-app.use('api/story',storyRouter)
+app.use('api/story', storyRouter)
 app.use('api/message', messageRouter)
+
 
 // start server
 const PORT = process.env.PORT || 4000;
