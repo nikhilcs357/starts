@@ -6,6 +6,7 @@ import Post from "../models/post.js";
 import { inngest } from "../inngest/index.js";
 
 
+
 // get user data using userId
 export const getUserData = async (req, res) => {
   try {
@@ -236,7 +237,7 @@ export const getUserConnections = async (req,res) => {
     const followers = user.followers
     const following = user.following
 
-    const pendingConnections = (await Connection.find({to_user_id: userId,
+    const pendingConnections = (await connection.find({to_user_id: userId,
       status: 'pending'}).populate('from_user_id')).map(connection => connection.from_user_id)
 
       res.json({success: true, connections, followers, following, pendingConnections})
