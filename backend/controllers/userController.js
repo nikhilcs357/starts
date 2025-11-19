@@ -198,8 +198,8 @@ export const sendConnectionRequest = async (req,res) => {
     // check if users are already connected
     const connection = await Connection.findOne({
       $or: [
-        {rom_user_id: userId, to_user_id: id},
-        {rom_user_id: id, to_user_id: userId},       
+        {from_user_id: userId, to_user_id: id},
+        {from_user_id: id, to_user_id: userId},       
       ]
     })
 
@@ -256,7 +256,7 @@ export const acceptConnectionRequest = async (req,res) => {
     const {userId} = req.auth()
     const {id} = req.body
      
-    const connection = await Connection.findOne({from_user_id: id, to_user_id: userId})
+    const connection = await connection.findOne({from_user_id: id, to_user_id: userId})
 
     if(!connection){
       return res.json({success: false, message: 'connection not found' })
