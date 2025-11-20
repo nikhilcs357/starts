@@ -8,6 +8,8 @@ import connection from "../models/Connection.js";
 
 
 
+
+
 // get user data using userId
 export const getUserData = async (req, res) => {
   try {
@@ -240,7 +242,7 @@ export const getUserConnections = async (req,res) => {
 
     const pendingConnections = (await connection.find({to_user_id: userId,
       status: 'pending'}).populate('from_user_id')).map(connection=>connection.from_user_id)
-      
+
       res.json({success: true, connections, followers, following, pendingConnections})
     
   } catch (error) {
@@ -262,7 +264,7 @@ export const acceptConnectionRequest = async (req,res) => {
       return res.json({success: false, message: 'connection not found' })
     }
 
-    const user = await User.findById(userId)
+    const user = await User.findById(userId);
     user.connections.push(id);
     await user.save()
 
@@ -272,6 +274,8 @@ export const acceptConnectionRequest = async (req,res) => {
 
     connection.status = 'accepted';
     await connection.save()
+
+    res.json({ success: true, message: 'connection accepted successfully'})
 
   } catch (error) {
    console.log(error);
