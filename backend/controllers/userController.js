@@ -189,14 +189,14 @@ export const sendConnectionRequest = async (req,res) => {
 
   //  check if user more than 40 requests in last 24 hour
   const last24Hours  = new Date(Date.now() - 24 * 60 * 60 * 1000) 
-  const connectionRequest = await Connection.find({from_user_id: userId,created_at:
+  const connectionRequest = await connection.find({from_user_id: userId,created_at:
     {$gt: last24Hours}})
     if(connectionRequest.length >=40){
       return res.json({success: false, message: 'you have send more than 40 connection requests in the last 24 hours'})
     }
 
     // check if users are already connected
-    const connection = await Connection.findOne({
+    const connection = await connection.findOne({
       $or: [
         {from_user_id: userId, to_user_id: id},
         {from_user_id: id, to_user_id: userId},       
@@ -204,7 +204,7 @@ export const sendConnectionRequest = async (req,res) => {
     })
 
     if(!connection){
-      const newConnection = await Connection.create({
+      const newConnection = await connection.create({
         from_user_id: userId,
         to_user_id: id
       })
@@ -238,9 +238,9 @@ export const getUserConnections = async (req,res) => {
     const followers = user.followers
     const following = user.following
 
-    const pendingConnections = await connection.find({to_user_id: userId,
-      status: 'pending'}).populate('from_user_id').map(connection => connection.from_user_id)
-
+    const pendingConnections = (await connection.find({to_user_id: userId,
+      status: 'pending'}).populate('from_user_id')).map(connection=>connection.from_user_id)
+      
       res.json({success: true, connections, followers, following, pendingConnections})
     
   } catch (error) {
