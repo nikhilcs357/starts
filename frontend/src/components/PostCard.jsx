@@ -3,25 +3,45 @@ import { BadgeCheck, MessageCircle, Share2, Heart } from "lucide-react";
 import moment from "moment";
 import { dummyUserData } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useAuth } from "@clerk/clerk-react";
+import api from "../api/axios";
+import toast from "react-hot-toast";
 
 const PostCard = ({ post }) => {
+
+    const postWithHashtags = post.content?.replace(/(#\w+)/g,
+    '<span class="text-indigo-600 font-medium cursor-pointer hover:underline">$1</span>');
   const [likes, setLikes] = useState(post.likes || []);
-  const currentUser = dummyUserData;
+  const currentUser = useSelector((state) => state.user.value)
+
+
+  const { getToken } = useAuth()
+
 
   const handleLike = async () => {
-    if (likes.includes(currentUser._id)) {
-      setLikes(likes.filter((id) => id !== currentUser._id));
-    } else {
-      setLikes([...likes, currentUser._id]);
-    }
+     try {
+       const { data } = await api.post(`/api/post/like`, {postId: post._id},
+        {headers: {Authorization: `Bearer ${await getToken()}`}})
+
+      if (data.success){
+        toast.success(data.message)
+        setLikes(prev =>{
+          if(prev.includes(currentUser._id)){
+            return prev.filter(id=> id !== currentUser._id)
+          }else{
+            return [...prev, currentUser._id]
+          }
+        })
+      }else{
+        toast(data.message)
+      }
+     } catch (error) {
+       toast.error(error.message)
+     }
   }
 
   const navigate = useNavigate()
-
-  const postWithHashtags = post.content?.replace(
-    /(#\w+)/g,
-    '<span class="text-indigo-600 font-medium cursor-pointer hover:underline">$1</span>'
-  );
 
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 w-full max-w-2xl mx-auto p-5 space-y-5 border border-gray-100">

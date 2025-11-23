@@ -10,7 +10,7 @@ const Menuitems = ({ setSidebarOpen }) => {
           key={to}
           to={to}
           end={to === '/'}
-          onClick={() => setSidebarOpen?.(false)} // ✅ clean optional chaining
+          onClick={() => setSidebarOpen?.(false)} 
           className={({ isActive }) =>
             `px-3.5 py-2 flex items-center gap-3 rounded-xl transition-colors duration-200 ${
               isActive

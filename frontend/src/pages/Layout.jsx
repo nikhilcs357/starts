@@ -4,10 +4,13 @@ import { Outlet } from 'react-router-dom'
 import { dummyUserData } from '../assets/assets'
 import Loading from '../components/Loading'
 import Sidebar from '../components/Sidebar'
+import { useSelector } from 'react-redux'
+
 const Layout = () => {
 
-  const[ sidebarOpen, setSidebarOpen] = useState(false)
-  const User = dummyUserData
+    const[ sidebarOpen, setSidebarOpen] = useState(false)
+      const User = useSelector((state)=>state.user.value)
+
 
   return User ? (
     <div className='w-full flex h-screen'>
