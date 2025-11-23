@@ -7,9 +7,6 @@ import connection from "../models/Connection.js";
 
 
 
-
-
-
 // get user data using userId
 export const getUserData = async (req, res) => {
   try {
@@ -239,7 +236,7 @@ export const getUserConnections = async (req,res) => {
     const connections = user.connections
     const followers = user.followers
     const following = user.following
-
+    
     const pendingConnections = (await connection.find({to_user_id: userId,
       status: 'pending'}).populate('from_user_id')).map(connection=>connection.from_user_id)
 
