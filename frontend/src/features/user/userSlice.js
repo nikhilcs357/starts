@@ -1,6 +1,5 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit'
 import api from '../../api/axios.js'
-import { data } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 const initialState = {
@@ -8,15 +7,15 @@ const initialState = {
 }
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async (token) =>{
- const {data} = await api.get('/api/user/data', {
-    headers: {Authorization: `Bearer ${token}`}
+ const { data } = await api.get('/api/user/data', {
+    headers: { Authorization: `Bearer ${token}`}
  })
  return data.success ? data.user : null
 })
 
 export const updateUser = createAsyncThunk('user/update', async ({userData, token}) =>
     {
- const {data} = await api.post('/api/user/update', userData, {
+ const { data } = await api.post('/api/user/update', userData, {
     headers: {Authorization: `Bearer ${token}`}
  })
  if(data.success) {

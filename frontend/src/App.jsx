@@ -19,8 +19,8 @@ import { addMessage } from "./features/messages/messagesSlice";
 import Notification from "./components/Notification";
 
 const App = () => {
-  const { user } = useUser();
-  const { getToken } = useAuth();
+  const { user } = useUser()
+  const { getToken } = useAuth()
   const { pathname } = useLocation()
   const pathnameRef = useRef(pathname)
 
