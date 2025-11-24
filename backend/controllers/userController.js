@@ -6,13 +6,12 @@ import { inngest } from "../inngest/index.js";
 import connection from "../models/Connection.js";
 
 
-
 // get user data using userId
 export const getUserData = async (req, res) => {
   try {
-    const { userId } = req.auth();
-    const user = await User.findById(userId);
-    if (!user) {
+    const { userId } = req.auth()
+    const user = await User.findById(userId)
+    if (!user){
       return res.json({ success: false, message: "user not found" });
     }
     res.json({ success: true, user });
@@ -20,7 +19,7 @@ export const getUserData = async (req, res) => {
     console.log(error);
     res.json({ success: false, message: error.message });
   }
-};
+}
 
 // update user data
 export const updateUserData = async (req, res) => {
