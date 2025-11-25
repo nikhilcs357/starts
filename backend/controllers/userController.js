@@ -3,7 +3,7 @@ import fs from "fs";
 import ImageKit from "../config/imagekit.js";
 import Post from "../models/post.js";
 import { inngest } from "../inngest/index.js";
-import connection from "../models/Connection.js";
+import Connection from "../models/Connection.js";
 
 
 // get user data using userId
@@ -126,21 +126,21 @@ export const discoverUsers = async (req, res) => {
 export const followUser = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { _id } = req.body;
+    const { id } = req.body;
 
-    const currentUser = await User.findById(userId);
+    const user = await User.findById(userId);
 
-    if (currentUser.following.includes(_id)) {
+    if (user.following.includes(id)) {
       return res.json({
         success: false,
         message: "you are already following this user",
       });
     }
 
-    currentUser.following.push(_id);
-    await currentUser.save();
+    user.following.push(id);
+    await user.save();
 
-    const toUser = await User.findById(_id);
+    const toUser = await User.findById(id);
     toUser.followers.push(userId);
     await toUser.save();
 
@@ -155,18 +155,14 @@ export const followUser = async (req, res) => {
 export const unfollowUser = async (req, res) => {
   try {
     const { userId } = req.auth();
-    const { _id } = req.body;
+    const { id } = req.body;
 
-    const currentUser = await User.findById(userId);
-    currentUser.following = currentUser.following.filter(
-      (id) => id.toString() !== _id.toString()
-    );
-    await currentUser.save();
+    const user = await User.findById(userId);
+    user.following = user.following.filter(user => user !== id);
+    await user.save();
 
-    const toUser = await User.findById(_id);
-    toUser.followers = toUser.followers.filter(
-      (id) => id.toString() !== userId.toString()
-    );
+    const toUser = await User.findById(id);
+    toUser.followers = toUser.followers.filter(user=>user !== userId);
     await toUser.save();
 
     res.json({
@@ -183,18 +179,18 @@ export const unfollowUser = async (req, res) => {
 export const sendConnectionRequest = async (req,res) => {
   try {
     const {userId} = req.auth()
-    const {id} = req.body;
+    const { id } = req.body;
 
   //  check if user more than 40 requests in last 24 hour
   const last24Hours  = new Date(Date.now() - 24 * 60 * 60 * 1000) 
-  const connectionRequest = await connection.find({from_user_id: userId,created_at:
-    {$gt: last24Hours}})
-    if(connectionRequest.length >=40){
-      return res.json({success: false, message: 'you have send more than 40 connection requests in the last 24 hours'})
+  const connectionRequests = await Connection.find({from_user_id: userId,
+    created_at:{$gt: last24Hours}})
+    if(connectionRequests.length >=20){
+      return res.json({success: false, message: 'you have sent more than 20 connection requests in the last 24 hours'})
     }
 
     // check if users are already connected
-    const connection = await connection.findOne({
+    const connection = await Connection.findOne({
       $or: [
         {from_user_id: userId, to_user_id: id},
         {from_user_id: id, to_user_id: userId},       
@@ -202,7 +198,7 @@ export const sendConnectionRequest = async (req,res) => {
     })
 
     if(!connection){
-      const newConnection = await connection.create({
+      const newConnection = await Connection.create({
         from_user_id: userId,
         to_user_id: id
       })
@@ -232,14 +228,18 @@ export const getUserConnections = async (req,res) => {
     const {userId} = req.auth()
     const user = await User.findById(userId).populate('connections followers following')
 
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
     const connections = user.connections
     const followers = user.followers
     const following = user.following
     
-    const pendingConnections = (await connection.find({to_user_id: userId,
-      status: 'pending'}).populate('from_user_id')).map(connection=>connection.from_user_id)
+    const pendingConnections = (await Connection.find({to_user_id: userId,
+    status: 'pending'}).populate('from_user_id')).map(connection=>connection.from_user_id)
 
-      res.json({success: true, connections, followers, following, pendingConnections})
+    res.json({success: true, connections, followers, following, pendingConnections})
     
   } catch (error) {
    console.log(error);
@@ -254,7 +254,7 @@ export const acceptConnectionRequest = async (req,res) => {
     const {userId} = req.auth()
     const {id} = req.body
      
-    const connection = await connection.findOne({from_user_id: id, to_user_id: userId})
+    const connection = await Connection.findOne({from_user_id: id, to_user_id: userId})
 
     if(!connection){
       return res.json({success: false, message: 'connection not found' })
@@ -265,7 +265,7 @@ export const acceptConnectionRequest = async (req,res) => {
     await user.save()
 
     const toUser = await User.findById(id)
-    user.connections.push(userId);
+    toUser.connections.push(userId);
     await toUser.save()
 
     connection.status = 'accepted';

@@ -66,6 +66,8 @@ useEffect(()=>{
   })
 },[])
 
+const currentData = dataArray.find(item => item.label === currentTab)?.value || []
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">

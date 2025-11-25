@@ -44,7 +44,7 @@ const App = () => {
 
   useEffect(()=>{
     if(user){
-      const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/message/' + user._id);
+      const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/message/' + user.id);
 
       eventSource.onmessage = (event)=>{
         const message =JSON.parse(event.data)
