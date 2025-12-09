@@ -7,7 +7,7 @@ import { inngest } from "../inngest/index.js";
 // Add User Story
 export const addUserStory = async (req, res) => {   
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;;
     const { content, media_type, background_color } = req.body;
     const media = req.file;
 
@@ -48,7 +48,7 @@ export const addUserStory = async (req, res) => {
 // get user stories
 export const getStories = async (req, res) => {    
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;;
     const me = await User.findById(userId);       
 
     // user connections + followings
