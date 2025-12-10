@@ -47,8 +47,8 @@ export const syncUser = async (req, res, next) => {
       console.log('user created in DB:', user);
     }
 
-    // console.log('Calling next()');
-    // next();
+    console.log('Calling next()');
+    next();
   } catch (error) {
     console.error('Error in syncUser middleware:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });

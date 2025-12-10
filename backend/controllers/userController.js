@@ -9,7 +9,7 @@ import Connection from "../models/Connection.js";
 // get user data using userId
 export const getUserData = async (req, res) => {
   try {
-    const { userId } = req.auth()
+    const { userId } = req.auth;
     const user = await User.findById(userId)
     if (!user){
       return res.json({ success: false, message: "user not found" });
@@ -24,7 +24,7 @@ export const getUserData = async (req, res) => {
 // update user data
 export const updateUserData = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     let { username, bio, location, full_name } = req.body;
 
     const tempUser = await User.findById(userId);
@@ -99,7 +99,7 @@ export const updateUserData = async (req, res) => {
 // Find users using username, email, location, name
 export const discoverUsers = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { input } = req.body;
 
     const allUsers = await User.find({
@@ -125,7 +125,7 @@ export const discoverUsers = async (req, res) => {
 // follow user
 export const followUser = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.body;
 
     const user = await User.findById(userId);
@@ -154,7 +154,7 @@ export const followUser = async (req, res) => {
 // unfollow user
 export const unfollowUser = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;
     const { id } = req.body;
 
     const user = await User.findById(userId);
@@ -178,7 +178,7 @@ export const unfollowUser = async (req, res) => {
 // send connection request
 export const sendConnectionRequest = async (req,res) => {
   try {
-    const {userId} = req.auth()
+    const {userId} = req.auth;
     const { id } = req.body;
 
   //  check if user more than 40 requests in last 24 hour
@@ -225,7 +225,7 @@ export const sendConnectionRequest = async (req,res) => {
 
 export const getUserConnections = async (req,res) => {
   try {
-    const {userId} = req.auth()
+    const {userId} = req.auth;
     const user = await User.findById(userId).populate('connections followers following')
 
     if (!user) {
@@ -251,7 +251,7 @@ export const getUserConnections = async (req,res) => {
 
 export const acceptConnectionRequest = async (req,res) => {
   try {
-    const {userId} = req.auth()
+    const {userId} = req.auth;
     const {id} = req.body
      
     const connection = await Connection.findOne({from_user_id: id, to_user_id: userId})
@@ -274,7 +274,7 @@ export const acceptConnectionRequest = async (req,res) => {
     res.json({ success: true, message: 'connection accepted successfully'})
 
   } catch (error) {
-   console.log(error);
+      console.log(error);
    res.json({success: false, message: error.message})
   }
 }

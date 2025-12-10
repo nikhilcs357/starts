@@ -6,7 +6,7 @@ import User from "../models/User.js";
 // Add Post
 export const addpost = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;;
     const { content, post_type } = req.body;
     const images = req.files;
 
@@ -55,7 +55,7 @@ export const addpost = async (req, res) => {
 // get post
 export const getFeedPosts = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;;
     const me = await User.findById(userId);   
 
     const userIds = [userId, ...me.connections, ...me.following];
@@ -74,7 +74,7 @@ export const getFeedPosts = async (req, res) => {
 // Like Post
 export const likePost = async (req, res) => {
   try {
-    const { userId } = req.auth();
+    const { userId } = req.auth;;
     const { postId } = req.body;
 
     const post = await Post.findById(postId);
