@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth } from "@clerk/clerk-react";
 import { fetchConnections } from "../features/connection/connectionsSlice";
+import { fetchConversations } from "../features/messages/messagesSlice";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 
@@ -19,7 +20,8 @@ const Connections = () => {
   const { getToken } = useAuth()
   const dispatch = useDispatch()
 
-  const {connections, pendingConnections, followers, following} = useSelector((state)=>state.connections)
+  const { connections, pendingConnections, followers, following } = useSelector((state) => state.connections)
+  const { conversations } = useSelector((state) => state.messages);
 
   const dataArray = [
     { label: "Followers", value: followers, Icon: Users },
@@ -28,15 +30,15 @@ const Connections = () => {
     { label: "Connections", value: connections, Icon: UserPlus },
   ];
 
-  const handleUnfollow = async(userId) =>{
+  const handleUnfollow = async (userId) => {
     try {
-      const { data } = await api.post('/api/user/unfollow', {id: userId}, {
-        headers: {Authorization: `Bearer ${await getToken()}`}
+      const { data } = await api.post('/api/user/unfollow', { id: userId }, {
+        headers: { Authorization: `Bearer ${await getToken()}` }
       })
-      if(data.success){
+      if (data.success) {
         toast.success(data.message)
         dispatch(fetchConnections(await getToken()))
-      }else{
+      } else {
         toast(data.message)
       }
     } catch (error) {
@@ -44,15 +46,15 @@ const Connections = () => {
     }
   }
 
-    const accceptConnection = async(userId) =>{
+  const accceptConnection = async (userId) => {
     try {
-      const { data } = await api.post('/api/user/accept', {id: userId}, {
-        headers: {Authorization: `Bearer ${await getToken()}`}
+      const { data } = await api.post('/api/user/accept', { id: userId }, {
+        headers: { Authorization: `Bearer ${await getToken()}` }
       })
-      if(data.success){
+      if (data.success) {
         toast.success(data.message)
         dispatch(fetchConnections(await getToken()))
-      }else{
+      } else {
         toast(data.message)
       }
     } catch (error) {
@@ -60,13 +62,14 @@ const Connections = () => {
     }
   }
 
-useEffect(()=>{
-  getToken().then((token)=>{
-    dispatch(fetchConnections(token))
-  })
-},[])
+  useEffect(() => {
+    getToken().then((token) => {
+      dispatch(fetchConnections(token))
+      dispatch(fetchConversations(token))
+    })
+  }, [])
 
-const currentData = dataArray.find(item => item.label === currentTab)?.value || []
+  const currentData = dataArray.find(item => item.label === currentTab)?.value || []
 
 
   return (
@@ -99,11 +102,10 @@ const currentData = dataArray.find(item => item.label === currentTab)?.value || 
             <button
               key={tab.label}
               onClick={() => setCurrentTab(tab.label)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                currentTab === tab.label
-                  ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${currentTab === tab.label
+                ? "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md"
+                : "text-gray-600 hover:bg-gray-100"
+                }`}
             >
               <tab.Icon className="w-4 h-4" />
               {tab.label}
@@ -134,6 +136,23 @@ const currentData = dataArray.find(item => item.label === currentTab)?.value || 
                 {user.bio?.slice(0, 40) || "No bio available"}
               </p>
 
+              {currentTab === "Connections" && (
+                <div className="mt-2 w-full">
+                  {(() => {
+                    const conversation = conversations?.find(c => c.userDetails._id === user._id);
+                    if (conversation?.lastMessage) {
+                      return (
+                        <p className="text-xs text-gray-500 truncate w-full px-2">
+                          <span className="font-semibold">Last: </span>
+                          {conversation.lastMessage.text || (conversation.lastMessage.message_type === 'image' ? 'Image' : '')}
+                        </p>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+              )}
+
               <div className="flex gap-2 mt-4 w-full">
                 <button
                   onClick={() => navigate(`/profile/${user._id}`)}
@@ -143,13 +162,13 @@ const currentData = dataArray.find(item => item.label === currentTab)?.value || 
                 </button>
 
                 {currentTab === "Following" && (
-                  <button onClick={()=> handleUnfollow(user._id)} className="flex-1 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 active:scale-95 transition">
+                  <button onClick={() => handleUnfollow(user._id)} className="flex-1 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-800 active:scale-95 transition">
                     Unfollow
                   </button>
                 )}
 
                 {currentTab === "Pending" && (
-                  <button onClick={()=>accceptConnection(user._id)} className="flex-1 py-2 text-sm rounded-lg bg-green-500 text-white hover:bg-green-600 active:scale-95 transition">
+                  <button onClick={() => accceptConnection(user._id)} className="flex-1 py-2 text-sm rounded-lg bg-green-500 text-white hover:bg-green-600 active:scale-95 transition">
                     Accept
                   </button>
                 )}
