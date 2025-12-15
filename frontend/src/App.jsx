@@ -31,37 +31,37 @@ const App = () => {
       if (user) {
         const token = await getToken();
         dispatch(fetchUser(token))
-        dispatch(fetchConnections(token))   
+        dispatch(fetchConnections(token))
       }
     };
 
     fetchData();
   }, [user, getToken, dispatch]);
 
-  useEffect(()=>{
+  useEffect(() => {
     pathnameRef.current = pathname
-  },[pathname])  
+  }, [pathname])
 
-  useEffect(()=>{
-    if(user){
+  useEffect(() => {
+    if (user) {
       const eventSource = new EventSource(import.meta.env.VITE_BASEURL + '/api/message/' + user.id);
 
-      eventSource.onmessage = (event)=>{
-        const message =JSON.parse(event.data)
+      eventSource.onmessage = (event) => {
+        const message = JSON.parse(event.data)
 
-        if(pathnameRef.current === ('/messages/' + message.from_user_id._id)){
+        if (pathnameRef.current === ('/messages/' + message.from_user_id._id)) {
           dispatch(addMessage(message))
-        }else{
-        toast.custom((t)=>(
-          <Notification t={t} message={message}/>
-        ), {position: "bottom-right"})
+        } else {
+          toast.custom((t) => (
+            <Notification t={t} message={message} />
+          ), { position: "bottom-right" })
         }
+      }
+      return () => {
+        eventSource.close()
+      }
     }
-    return()=>{
-      eventSource.close()
-    }
-  }
-},[user, dispatch])
+  }, [user, dispatch])
 
   return (
     <>
@@ -70,12 +70,12 @@ const App = () => {
       <Routes>
         <Route path="/" element={!user ? <Login /> : <Layout />}>
           <Route index element={<Feed />} />
-          <Route path="Messages" element={<Messages />} />
-          <Route path="Messages/:userId" element={<ChatBox />} />
-          <Route path="Connections" element={<Connections />} />
-          <Route path="Discover" element={<Discover />} />
-          <Route path="Profile" element={<Profile />} />
-          <Route path="Profile/:ProfileId" element={<Profile />} />
+          <Route path="messages" element={<Messages />} />
+          <Route path="messages/:userId" element={<ChatBox />} />
+          <Route path="connections" element={<Connections />} />
+          <Route path="discover" element={<Discover />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="profile/:profileId" element={<Profile />} />
           <Route path="/create-post" element={<CreatePost />} />
         </Route>
       </Routes>
